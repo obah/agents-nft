@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 contract Marketplace {
-    /// @dev a mapping of tokenIds to owner addresses
+    /// @dev keep track of tokenIds and owner addresses
     mapping(uint256 => address) public tokens;
 
     /// @dev set the purchase price of nft in the marketplace
