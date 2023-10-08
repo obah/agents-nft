@@ -1,26 +1,29 @@
-import { ethers } from "hardhat";
+import hre from "hardhat";
+// import hre from 'hardhat';
 
-async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+type Time = number;
 
-  const lockedAmount = ethers.parseEther("0.001");
-
-  const lock = await ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
-  });
-
-  await lock.waitForDeployment();
-
-  console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
-  );
+async function sleep(ms: Time) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
+async function main() {
+  console.log("-----------------------------");
+  console.log("Deploying whitelist contract");
+
+  const whitelistContract = await hre.ethers.deployContract("Whitelist", [50]);
+  await whitelistContract.waitForDeployment();
+
+  console.log(`Whitelist contract deployed at: ${whitelistContract.target}`);
+
+  await sleep(30 * 1000);
+
+  await hre.run("verify:verify", {
+    address: whitelistContract.target,
+    constructorArguments: [50],
+  });
+}
+
 main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
